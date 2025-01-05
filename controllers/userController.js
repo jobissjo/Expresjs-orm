@@ -5,14 +5,15 @@ import { generateToken } from "../utils/tokenUtils.js";
 
 export const createUser = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-
+    const { username, email, password, userType  } = req.body;
+    const finalUserType = userType || 'user';
     const hashedPassword = await hashPassword(password);
     console.log(`hashedPassword: ${hashedPassword}`);
     const user = await User.create({
       username,
       email,
       password: hashedPassword,
+      userType: finalUserType,
     });
 
     res.status(200).json({
@@ -45,21 +46,20 @@ export const LoginUser = async (req, res) => {
         message: "email not found",
       });
     }
-    console.log("emailPwd:", password, email);
 
     const isMatch = await verifyPassword(password, user.password);
-    console.log("isMatch:", isMatch);
+
     if (!isMatch) {
       res.status(401).json({
         message: "Invalid credentials",
       });
     }
-    console.log("isMatch:", isMatch);
+    console.log("is Match", isMatch);
+    
     const data = { id: user.id, userType: user.userType };
     const token = await generateToken(data);
 
-    console.log("TOKEN:", token);
-
+    console.log("TOKEN: "+ token)
     res.status(200).json({
       accessToken: token,
       tokenType: "Bearer",
@@ -67,7 +67,7 @@ export const LoginUser = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      message: "Error creating user",
+      message: "Error in login user",
       error: error.message,
     });
   }

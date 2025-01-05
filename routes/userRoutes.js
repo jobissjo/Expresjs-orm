@@ -6,12 +6,12 @@ import {
   getUserById,
   LoginUser,
 } from "../controllers/userController.js";
-import { authenticate } from "../middleware/auth.js";
+import { authenticate, adminAuthenticate } from "../middleware/auth.js";
 
 const router = express.Router();
 
 router.post("/", createUser);
-router.get("/", getAllUsers);
+router.get("/", adminAuthenticate,getAllUsers);
 router.post("/login/", LoginUser);
 router.get("/detail", authenticate, getCurrentUser);
 router.get("/:id", getUserById);
